@@ -119,9 +119,9 @@ xmlns:th="http://www.thymeleaf.org">
             <li class="page-item"><a class="page-link" th:href="@{/clientes (page=${usuarios.getPageable().getPageNumber()-1})}" th:if="${usuarios.getPageable().hasPrevious()}" th:text="${usuarios.getPageable().getPageNumber()}">1</a></li>
             <li class="page-item active"><a class="page-link" href="#"  th:text="${usuarios.getPageable().getPageNumber()+1}">1</a></li>
             <li class="page-item"><a class="page-link" th:href="@{/clientes (page=${usuarios.getPageable().getPageNumber()+1})}" th:if="${usuarios.getPageable().next().getPageNumber() < usuarios.getPageable.getPageSize()+1}" th:text="${usuarios.getPageable().getPageNumber()+2}">1</a></li>
-            <li class="page-item"><a class="page-link" th:href="@{/clientes (page=${usuarios.getPageable().getPageNumber()+1})}" th:if="${usuarios.getPageable().next().getPageNumber() < usuarios.getPageable.getPageSize()+1}" th:text="Next">1</a></li>
-            <li class="page-item" th:if="${usuarios.getPageable().next().getPageNumber() < usuarios.getPageable.getPageSize()}">
-                <a class="page-link" th:href="@{/clientes (page=${usuarios.getPageable().getPageSize()})}" aria-label="Next">
+            <li class="page-item"><a class="page-link" th:href="@{/clientes (page=${usuarios.getPageable().getPageNumber()+1})}" th:if="${usuarios.getPageable().next().getPageNumber() <= usuarios.getPageable.getPageSize()+1}" th:text="Next">1</a></li>
+            <li class="page-item" th:if="${usuarios.getPageable().next().getPageNumber() <= usuarios.getPageable.getPageSize()}">
+                <a class="page-link" th:href="@{/clientes (page=${usuarios.getPageable().getPageSize() + 1})}" aria-label="Next">
                     <span aria-hidden="true"> Last &raquo;</span>
                 </a>
             </li>
