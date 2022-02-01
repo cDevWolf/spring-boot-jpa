@@ -12,7 +12,12 @@ xmlns:th="http://www.thymeleaf.org">
 
     <div class="d-flex justify-content-center align-items-center m-4">
         <div class="card "  style="width: 18rem;">
-            <img th:if="${user.imageClientPhoto!=null}" th:src="@{'/upload/' + ${user.imageClientPhoto}}" class="card-img-top" alt="No image">
+            <div th:if="${user.imageClientPhoto != null}">
+                <div th:if="${!user.imageClientPhoto.isBlank() || !user.imageClientPhoto.isEmpty() || !user.imageClientPhoto.equals('')}">
+                    <img th:src="@{'/uploads/' + ${user.imageClientPhoto}}" class="card-img-top" alt="No image" style="background-image: url('static/images/img.png'); width: 264px"/>
+                </div>
+            </div>
+
             <div class="card-body">
                 <h5 class="card-title" th:text="${user.nombre} + ${user.apellido}">Card title</h5>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -27,13 +32,45 @@ xmlns:th="http://www.thymeleaf.org">
                 <a href="#" class="card-link">Card link</a>
                 <a href="#" class="card-link">Another link</a>
             </div>
+
+            <form th:action="@{/updatePhoto}" method="post" th:object="${user}" enctype="multipart/form-data">
+                <input type="text" hidden style="display: none" th:field="*{id}"/>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="d-flex flex-column">
+                                <label class="text-center" th:for="imageClietPhoto">User photo</label>
+                                <input type="file" id="fileLoad"   class="form-control" name="image" value="" accept="image/png,image/jpeg"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center mt-4">
+                        <input type="submit" id="change" disabled class="btn btn-success btn-send pt-2 btn-block " value="Change photo"/>
+                    </div>
+                </div>
+            </form>
+
+
+
         </div>
+
+
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 <script th:src="@{/js/bootstrap.bundle.min.js}" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 <script>
-    var profileCardModal = new boostrap.Modal(document.querySelector('#myModal'));
-    profileCardModal.toggle();
+
+    window.onload =  function fileLoaded(){
+        let fileLoad = document.querySelector('#fileLoad');
+        let buttonSend = document.querySelector('#change');
+
+        fileLoad.onchange = function (){
+            buttonSend.disabled = false;
+        }
+    };
+
 </script>
 </html>

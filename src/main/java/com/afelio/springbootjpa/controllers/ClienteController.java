@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Controller
 public class ClienteController {
@@ -58,29 +59,32 @@ public class ClienteController {
     }
 
     @PostMapping("/form")
-    public String insert(@Valid Usuario usuario,BindingResult result,Model model, @RequestParam(name = "image", required = false) MultipartFile multipartFile){
+    public String insert(@Valid Usuario usuario,BindingResult result,Model model, @RequestParam(name = "imagePhoto", required = false, defaultValue = " ") MultipartFile multipartFile){
 
         if(result.hasErrors()){
             logger.info(result.toString());
             return "form";
         }
 
+        usuario.setImageClientPhoto("");
 
-        if(multipartFile !=null){
+        if(multipartFile !=null || !multipartFile.isEmpty()){
             if(!multipartFile.isEmpty()){
-                Path uploadDirectory = Paths.get("src\\main\\resources\\static\\upload");
-                String rootPathUploadDirectory = uploadDirectory.toFile().getAbsolutePath();
+
+                String uniqueFileName = UUID.randomUUID().toString().concat("_").concat(multipartFile.getOriginalFilename());
+                Path rootPath = Path.of("uploads").resolve(uniqueFileName);
+                Path rootAbsolutPath = rootPath.toAbsolutePath();
+
                 try {
-                    byte[] bytes = multipartFile.getBytes();
-                    Path complete = Paths.get(rootPathUploadDirectory.concat("//").concat(multipartFile.getOriginalFilename()));
-                    Files.write(complete,bytes);
-                    usuario.setImageClientPhoto(multipartFile.getOriginalFilename());
+                    Files.copy(multipartFile.getInputStream(), rootAbsolutPath);
+                    usuario.setImageClientPhoto(uniqueFileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
 
+        logger.info("image: " + usuario.getImageClientPhoto());
        clienteService.save(usuario);
         usuario= new Usuario();
         model.addAttribute("usuario", usuario);
@@ -112,6 +116,33 @@ public class ClienteController {
         model.addAttribute("user", user);
 
             return "ver";
+        }
+
+
+        @PostMapping("/updatePhoto")
+        public String updatePhoto(@RequestParam Long id, @RequestParam(name = "image") MultipartFile multipartFile){
+
+            String uniqueFileName = UUID.randomUUID().toString().concat("_").concat(multipartFile.getOriginalFilename());
+            Path newPhoto = Path.of("uploads").resolve(uniqueFileName);
+
+            Usuario user = clienteService.findOne(id);
+            Path deleteRootPath = Path.of("uploads").resolve(user.getImageClientPhoto());
+
+            try {
+                if(user.getImageClientPhoto()!=null){
+                    if(!user.getImageClientPhoto().isBlank() || !user.getImageClientPhoto().isBlank()){
+                        Files.deleteIfExists(deleteRootPath.toAbsolutePath());
+                    }
+                }else {
+
+                }
+                Files.copy(multipartFile.getInputStream(), newPhoto.toAbsolutePath());
+                user.setImageClientPhoto(uniqueFileName);
+                clienteService.save(user);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return "redirect:/ver/".concat(id.toString());
         }
 
 

@@ -32,7 +32,6 @@ public class Usuario {
     private Date createAt;
 
     @Column(name = "image")
-    @Nullable
     private String imageClientPhoto;
 
 
@@ -76,7 +75,6 @@ public class Usuario {
         this.id = id;
     }
 
-    @Nullable
     public String getImageClientPhoto() {
         return imageClientPhoto;
     }
